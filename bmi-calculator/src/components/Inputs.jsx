@@ -1,27 +1,49 @@
 import React from "react";
 
-export default function Inputs() {
+export default function Inputs(props) {
   const [weight, setWeight] = React.useState("");
   const [height, setHeight] = React.useState("");
   const [heightUnit, setheightUnit] = React.useState("ft");
   const [weightUnit, setweightUnit] = React.useState("lbs");
+  const [final, setFinal] = React.useState(null);
 
+  let bmi = 0;
   const poundsorkilos = (e) => {
-    let bmi = 0;
     e.preventDefault();
     if (heightUnit === "ft" && weightUnit === "lbs") {
-      bmi = (703 * weight) / (height * height);
-    } else if (heightUnit === "cm" && weightUnit === "kg") {
-      bmi = weight / (height * height);
+      bmi = (703 * weight) / (height * 12 * (height * 12));
+    } else if (heightUnit === "cm" && weightUnit === "kgs") {
+      bmi = weight / ((height / 100) * (height / 100));
     } else if (heightUnit === "cm" && weightUnit === "lbs") {
-      bmi = weight / (height * height);
+      bmi = (703 * weight) / ((height / 30.48) * 12 * ((height / 30.48) * 12));
+    } else if (heightUnit === "ft" && weightUnit === "kgs") {
+      bmi = weight / ((height / 3.281) * (height / 3.281));
     }
+
+    setFinal(bmi.toFixed(2));
   };
+  //console.log(props.data);
+  function onlyNumberKey(e) {
+    // Only ASCII character in that range allowed
+    const re = /^\d*\.?\d*$/;
+    if (e === "" || re.test(e)) {
+      setHeight(e);
+    }
+  }
+
+  function onlyNumberKey2(e) {
+    // Only ASCII character in that range allowed
+    const re = /^\d*\.?\d*$/;
+    if (e === "" || re.test(e)) {
+      setWeight(e);
+    }
+  }
 
   return (
     <div>
       <form onSubmit={poundsorkilos}>
         <div className="height">
+          <p>Your Height?</p>
           <input
             type="radio"
             id="ft"
@@ -40,13 +62,13 @@ export default function Inputs() {
           ></input>
           <label>cm</label>
           <br></br>
-          <p>Your Height?</p>
+          <br></br>
           <input
-            type="number"
+            type="text"
             value={height}
-            onChange={(e) => setHeight(e.target.value)}
+            onChange={(e) => onlyNumberKey(e.target.value)}
             required
-            min="0"
+            //onKeyPress={(e) => onlyNumberKey(e.target.value)}
           />
         </div>
         <div className="weight">
@@ -69,17 +91,22 @@ export default function Inputs() {
           ></input>
           <label>kgs</label>
           <br></br>
+          <br></br>
           <input
-            type="number"
+            type="text"
             value={weight}
-            onChange={(e) => setWeight(e.target.value)}
+            onChange={(e) => onlyNumberKey2(e.target.value)}
             required
-            min="0"
           />
         </div>
         <br></br>
         <button type="submit">Go!</button>
       </form>
+      {final && (
+        <p>
+          <strong>Hello your BMI is {final}</strong>
+        </p>
+      )}
     </div>
   );
 }
